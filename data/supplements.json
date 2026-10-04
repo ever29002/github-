@@ -1,0 +1,302 @@
+{
+  "meta": {
+    "version": 1,
+    "updated": "2026-10-04",
+    "disclaimer": "この情報は一般的な参考情報であり、医学的助言ではありません。持病がある方、薬を飲んでいる方、妊娠・授乳中の方は、サプリを始める前に医師または薬剤師に相談してください。",
+    "upperLimitNote": "上限量は米国国立衛生研究所 (NIH ODS) が示す成人 (19歳以上) の耐容上限量です。日本の基準値 (日本人の食事摂取基準) とは異なる場合があります。",
+    "sources": {
+      "ods-vitamin-d": { "title": "Vitamin D - Health Professional Fact Sheet (NIH ODS)", "url": "https://ods.od.nih.gov/factsheets/VitaminD-HealthProfessional/" },
+      "ods-magnesium": { "title": "Magnesium - Health Professional Fact Sheet (NIH ODS)", "url": "https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/" },
+      "ods-iron": { "title": "Iron - Health Professional Fact Sheet (NIH ODS)", "url": "https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/" },
+      "ods-zinc": { "title": "Zinc - Health Professional Fact Sheet (NIH ODS)", "url": "https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/" },
+      "ods-calcium": { "title": "Calcium - Health Professional Fact Sheet (NIH ODS)", "url": "https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/" },
+      "ods-omega3": { "title": "Omega-3 Fatty Acids - Health Professional Fact Sheet (NIH ODS)", "url": "https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/" },
+      "ods-vitamin-c": { "title": "Vitamin C - Health Professional Fact Sheet (NIH ODS)", "url": "https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/" },
+      "ods-vitamin-b12": { "title": "Vitamin B12 - Health Professional Fact Sheet (NIH ODS)", "url": "https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/" },
+      "ods-folate": { "title": "Folate - Health Professional Fact Sheet (NIH ODS)", "url": "https://ods.od.nih.gov/factsheets/Folate-HealthProfessional/" },
+      "ods-vitamin-k": { "title": "Vitamin K - Health Professional Fact Sheet (NIH ODS)", "url": "https://ods.od.nih.gov/factsheets/VitaminK-HealthProfessional/" },
+      "ods-vitamin-e": { "title": "Vitamin E - Health Professional Fact Sheet (NIH ODS)", "url": "https://ods.od.nih.gov/factsheets/VitaminE-HealthProfessional/" },
+      "ods-copper": { "title": "Copper - Health Professional Fact Sheet (NIH ODS)", "url": "https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/" }
+    }
+  },
+  "supplements": [
+    {
+      "id": "vitamin-d",
+      "name": "ビタミンD",
+      "aliases": ["ビタミンd", "ビタミンd3", "vitamin d", "vitamin d3", "d3", "コレカルシフェロール"],
+      "effects": [
+        "腸でのカルシウム吸収を助け、骨と歯の健康を保つ",
+        "筋肉や免疫の働きに関わる",
+        "日光に当たる機会が少ない人は不足しやすい"
+      ],
+      "timing": "脂溶性なので、脂質を含む食事と一緒に飲むと吸収されやすい",
+      "upperLimit": "100 µg (4,000 IU) / 日",
+      "medicationNotes": [
+        "サイアザイド系利尿薬との併用で血中カルシウムが高くなることがある",
+        "ステロイド薬・オルリスタットなどはビタミンDの吸収や代謝を下げることがある"
+      ],
+      "sources": ["ods-vitamin-d"]
+    },
+    {
+      "id": "magnesium",
+      "name": "マグネシウム",
+      "aliases": ["mg", "magnesium", "酸化マグネシウム", "クエン酸マグネシウム", "グリシン酸マグネシウム"],
+      "effects": [
+        "300以上の酵素の働きに関わり、エネルギー代謝を支える",
+        "筋肉や神経の正常な働き、骨の形成に関わる",
+        "ビタミンDを体内で活性化するのに必要"
+      ],
+      "timing": "空腹時はお腹がゆるくなりやすいので、食後がおすすめ",
+      "upperLimit": "サプリから 350 mg / 日 (食事分は含まない)",
+      "medicationNotes": [
+        "テトラサイクリン系・ニューキノロン系の抗菌薬と一緒に飲むと薬の吸収が下がる (抗菌薬の2時間前か4〜6時間後に)",
+        "骨粗しょう症の薬 (ビスホスホネート) とは2時間以上あける",
+        "胃酸を抑える薬 (PPI) の長期服用でマグネシウムが不足することがある"
+      ],
+      "sources": ["ods-magnesium"]
+    },
+    {
+      "id": "iron",
+      "name": "鉄",
+      "aliases": ["鉄分", "iron", "fe", "ヘム鉄", "非ヘム鉄"],
+      "effects": [
+        "赤血球のヘモグロビンの材料になり、全身に酸素を運ぶ",
+        "鉄欠乏性貧血の予防・改善 (特に月経のある女性は不足しやすい)"
+      ],
+      "timing": "空腹時のほうが吸収は良いが、胃が荒れる場合は食後に。お茶・コーヒーと同時は避ける",
+      "upperLimit": "45 mg / 日",
+      "medicationNotes": [
+        "甲状腺ホルモン薬 (レボチロキシン)・パーキンソン病薬 (レボドパ) の吸収を下げる。時間をあける",
+        "テトラサイクリン系・ニューキノロン系の抗菌薬と一緒に飲むと互いの吸収が下がる",
+        "胃酸を抑える薬 (PPI など) は鉄の吸収を下げることがある"
+      ],
+      "sources": ["ods-iron"]
+    },
+    {
+      "id": "zinc",
+      "name": "亜鉛",
+      "aliases": ["zinc", "zn"],
+      "effects": [
+        "免疫の働き、傷の治り、たんぱく質やDNAの合成に関わる",
+        "味覚を正常に保つのに必要"
+      ],
+      "timing": "空腹時に胃がむかつく場合は食後に",
+      "upperLimit": "40 mg / 日",
+      "medicationNotes": [
+        "テトラサイクリン系・ニューキノロン系の抗菌薬と一緒に飲むと互いの吸収が下がる (抗菌薬の2時間前か4〜6時間後に)",
+        "サイアザイド系利尿薬は亜鉛の尿中排泄を増やす"
+      ],
+      "sources": ["ods-zinc"]
+    },
+    {
+      "id": "calcium",
+      "name": "カルシウム",
+      "aliases": ["calcium", "ca", "炭酸カルシウム", "クエン酸カルシウム"],
+      "effects": [
+        "骨と歯の主な材料",
+        "筋肉の収縮、神経の伝達、血液の凝固に関わる"
+      ],
+      "timing": "一度に吸収できるのは500 mg程度までなので、量が多いときは分けて飲む。炭酸カルシウムは食後に",
+      "upperLimit": "2,500 mg / 日 (51歳以上は 2,000 mg)",
+      "medicationNotes": [
+        "甲状腺ホルモン薬・ビスホスホネート・テトラサイクリン系やニューキノロン系の抗菌薬の吸収を下げる。時間をあける",
+        "サイアザイド系利尿薬との併用で血中カルシウムが高くなることがある"
+      ],
+      "sources": ["ods-calcium"]
+    },
+    {
+      "id": "omega-3",
+      "name": "オメガ3 (EPA・DHA)",
+      "aliases": ["オメガ3", "omega-3", "omega3", "フィッシュオイル", "魚油", "epa", "dha", "fish oil", "クリルオイル"],
+      "effects": [
+        "血中の中性脂肪を下げる働きがある",
+        "細胞膜の材料になり、脳や目の網膜に多く含まれる"
+      ],
+      "timing": "食事と一緒に飲むと吸収が良く、魚臭いげっぷも出にくい",
+      "upperLimit": "公式な上限量はなし (米国FDAはサプリからEPA+DHA合計 5 g / 日までは安全としている)",
+      "medicationNotes": [
+        "ワルファリンなど血液をサラサラにする薬と併用すると、高用量で出血しやすくなる可能性がある"
+      ],
+      "sources": ["ods-omega3"]
+    },
+    {
+      "id": "vitamin-c",
+      "name": "ビタミンC",
+      "aliases": ["ビタミンc", "vitamin c", "アスコルビン酸"],
+      "effects": [
+        "コラーゲンの合成に必要で、皮膚や血管を健康に保つ",
+        "抗酸化作用がある",
+        "植物性食品の鉄 (非ヘム鉄) の吸収を高める"
+      ],
+      "timing": "水溶性で余分は尿に出るため、1日数回に分けると効率が良い",
+      "upperLimit": "2,000 mg / 日",
+      "medicationNotes": [
+        "抗がん剤治療・放射線治療中は高用量の抗酸化サプリについて主治医に相談する"
+      ],
+      "sources": ["ods-vitamin-c"]
+    },
+    {
+      "id": "vitamin-b12",
+      "name": "ビタミンB12",
+      "aliases": ["ビタミンb12", "b12", "vitamin b12", "コバラミン", "メチルコバラミン"],
+      "effects": [
+        "赤血球の生成、神経の働き、DNAの合成に関わる",
+        "動物性食品に多く、菜食中心の人や高齢者は不足しやすい"
+      ],
+      "timing": "いつ飲んでもよい",
+      "upperLimit": "設定なし (過剰症の報告がほとんどない)",
+      "medicationNotes": [
+        "糖尿病薬メトホルミンや胃酸を抑える薬 (PPI・H2ブロッカー) の長期服用でB12が不足しやすくなる"
+      ],
+      "sources": ["ods-vitamin-b12"]
+    },
+    {
+      "id": "folate",
+      "name": "葉酸",
+      "aliases": ["folate", "folic acid", "ビタミンb9"],
+      "effects": [
+        "DNAの合成や細胞分裂に必要で、赤血球の生成に関わる",
+        "妊娠を考えている女性は胎児の神経管閉鎖障害のリスク低減のために推奨される"
+      ],
+      "timing": "いつ飲んでもよい",
+      "upperLimit": "サプリ・強化食品から 1,000 µg / 日",
+      "medicationNotes": [
+        "メトトレキサートや一部の抗てんかん薬と相互作用がある"
+      ],
+      "sources": ["ods-folate"]
+    },
+    {
+      "id": "vitamin-k",
+      "name": "ビタミンK",
+      "aliases": ["ビタミンk", "ビタミンk2", "vitamin k", "vitamin k2", "k2", "mk-7", "mk-4"],
+      "effects": [
+        "血液を固める (止血する) 働きに必要",
+        "骨の形成に関わるたんぱく質の働きを助ける"
+      ],
+      "timing": "脂溶性なので、脂質を含む食事と一緒に",
+      "upperLimit": "設定なし",
+      "medicationNotes": [
+        "ワルファリンの効果を弱める。ワルファリンを飲んでいる人は自己判断で始めない"
+      ],
+      "sources": ["ods-vitamin-k"]
+    },
+    {
+      "id": "vitamin-e",
+      "name": "ビタミンE",
+      "aliases": ["ビタミンe", "vitamin e", "トコフェロール"],
+      "effects": [
+        "抗酸化作用があり、細胞膜を酸化から守る"
+      ],
+      "timing": "脂溶性なので、脂質を含む食事と一緒に",
+      "upperLimit": "1,000 mg / 日 (サプリの α-トコフェロールとして)",
+      "medicationNotes": [
+        "ワルファリンなど血液をサラサラにする薬と併用すると出血しやすくなる可能性がある"
+      ],
+      "sources": ["ods-vitamin-e"]
+    },
+    {
+      "id": "copper",
+      "name": "銅",
+      "aliases": ["copper", "cu"],
+      "effects": [
+        "鉄の利用や赤血球の生成、結合組織の形成に関わる"
+      ],
+      "timing": "いつ飲んでもよい",
+      "upperLimit": "10 mg / 日",
+      "medicationNotes": [
+        "ペニシラミン (ウィルソン病などの薬) は銅の排泄を増やす"
+      ],
+      "sources": ["ods-copper"]
+    }
+  ],
+  "interactions": [
+    {
+      "pair": ["calcium", "iron"],
+      "type": "caution",
+      "level": "medium",
+      "summary": "カルシウムは鉄の吸収を下げる",
+      "advice": "鉄とカルシウムは2時間以上あけて飲む",
+      "sources": ["ods-iron", "ods-calcium"]
+    },
+    {
+      "pair": ["iron", "zinc"],
+      "type": "caution",
+      "level": "low",
+      "summary": "高用量の鉄サプリを空腹時に一緒に飲むと、亜鉛の吸収が下がる",
+      "advice": "別々の時間に飲むか、食事と一緒に飲む",
+      "sources": ["ods-zinc", "ods-iron"]
+    },
+    {
+      "pair": ["zinc", "copper"],
+      "type": "caution",
+      "level": "medium",
+      "summary": "亜鉛を長期間多く (目安 40 mg/日超) とると、銅が不足することがある",
+      "advice": "亜鉛を高用量でとり続けない。長期でとる場合は銅を含むマルチミネラルも検討",
+      "sources": ["ods-zinc", "ods-copper"]
+    },
+    {
+      "pair": ["zinc", "magnesium"],
+      "type": "caution",
+      "level": "low",
+      "summary": "非常に高用量の亜鉛 (142 mg/日程度) はマグネシウムの吸収を妨げる",
+      "advice": "通常量なら気にしなくてよい。亜鉛は上限量 40 mg/日 を超えない",
+      "sources": ["ods-magnesium"]
+    },
+    {
+      "pair": ["calcium", "zinc"],
+      "type": "caution",
+      "level": "low",
+      "summary": "高用量のカルシウムは亜鉛の吸収を下げることがある",
+      "advice": "気になる場合は時間をずらして飲む",
+      "sources": ["ods-zinc"]
+    },
+    {
+      "pair": ["folate", "vitamin-b12"],
+      "type": "caution",
+      "level": "medium",
+      "summary": "葉酸を多くとると、ビタミンB12不足による貧血の症状が隠れ、神経の障害に気づくのが遅れることがある",
+      "advice": "葉酸を高用量でとる場合は、B12も不足していないか確認する",
+      "sources": ["ods-folate", "ods-vitamin-b12"]
+    },
+    {
+      "pair": ["omega-3", "vitamin-e"],
+      "type": "caution",
+      "level": "low",
+      "summary": "どちらも高用量で血液を固まりにくくする方向に働く可能性がある",
+      "advice": "抗凝固薬を飲んでいる人や手術前の人は医師に相談する",
+      "sources": ["ods-omega3", "ods-vitamin-e"]
+    },
+    {
+      "pair": ["iron", "vitamin-c"],
+      "type": "synergy",
+      "level": "medium",
+      "summary": "ビタミンCは植物性食品やサプリの鉄 (非ヘム鉄) の吸収を高める",
+      "advice": "一緒に飲むと効率が良い",
+      "sources": ["ods-iron", "ods-vitamin-c"]
+    },
+    {
+      "pair": ["vitamin-d", "calcium"],
+      "type": "synergy",
+      "level": "medium",
+      "summary": "ビタミンDは腸でのカルシウム吸収を助ける",
+      "advice": "骨の健康目的なら組み合わせると良い",
+      "sources": ["ods-vitamin-d", "ods-calcium"]
+    },
+    {
+      "pair": ["vitamin-d", "magnesium"],
+      "type": "synergy",
+      "level": "low",
+      "summary": "マグネシウムはビタミンDを体内で活性型に変えるのに必要",
+      "advice": "ビタミンDをとるならマグネシウム不足にも注意",
+      "sources": ["ods-magnesium", "ods-vitamin-d"]
+    },
+    {
+      "pair": ["vitamin-d", "vitamin-k"],
+      "type": "synergy",
+      "level": "low",
+      "summary": "どちらも骨の代謝に関わり、組み合わせて使われることが多い (効果の根拠はまだ限定的)",
+      "advice": "ワルファリンを飲んでいる場合はビタミンKを自己判断でとらない",
+      "sources": ["ods-vitamin-k", "ods-vitamin-d"]
+    }
+  ]
+}

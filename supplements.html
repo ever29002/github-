@@ -120,6 +120,27 @@
     .item-actions { display: flex; gap: 6px; flex-shrink: 0; }
     .empty { color: var(--muted); text-align: center; padding: 16px 0; }
     .hidden { display: none; }
+    details.info { font-size: 0.9rem; }
+    details.info summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+    details.info ul { display: block; margin: 6px 0 0; padding-left: 1.2em; list-style: disc; }
+    details.info li { border: none; padding: 0; display: list-item; }
+    details.info p { margin: 6px 0 0; }
+    .unknown { font-size: 0.85rem; color: var(--muted); margin: 0; }
+    .pair {
+      border-left: 4px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      display: grid;
+      gap: 4px;
+    }
+    .pair.caution { border-left-color: #ff9f0a; background: color-mix(in srgb, #ff9f0a 10%, transparent); }
+    .pair.synergy { border-left-color: #30d158; background: color-mix(in srgb, #30d158 10%, transparent); }
+    .pair-title { font-weight: 600; }
+    .pair p { margin: 0; }
+    .disclaimer { font-size: 0.8rem; color: var(--muted); }
+    .disclaimer p { margin: 0 0 6px; }
+    .disclaimer a { color: var(--accent); }
   </style>
 </head>
 <body>
@@ -176,6 +197,15 @@
       <ul id="list"></ul>
       <p class="empty hidden" id="empty">まだ登録されていません。</p>
     </section>
+
+    <section class="card hidden" id="pairsCard">
+      <h2>飲み合わせ</h2>
+      <ul id="pairs"></ul>
+    </section>
+
+    <section class="card disclaimer" id="disclaimer">
+      <p>効果・飲み合わせの情報を読み込んでいます…</p>
+    </section>
   </main>
 
   <script>
@@ -197,7 +227,27 @@
     const empty = document.getElementById('empty');
     const count = document.getElementById('count');
 
+    const pairsCard = document.getElementById('pairsCard');
+    const pairsList = document.getElementById('pairs');
+    const disclaimer = document.getElementById('disclaimer');
+
     let editingId = null;
+    let info = null; // data/supplements.json の中身
+
+    // 全角/半角・大文字小文字・空白の違いを吸収して比較する
+    const normalize = (s) => s.normalize('NFKC').toLowerCase().replace(/[\s・()（）]/g, '');
+
+    // 登録名からデータ上のサプリを探す。「カルシウム&マグネシウム」のように複数該当することもある。
+    // "mg" "ca" など2文字以下の英字の別名は、"500mg" のような量の表記に誤って当たらないよう完全一致のみ。
+    const matchSupplements = (name) => {
+      if (!info) return [];
+      const n = normalize(name);
+      return info.supplements.filter((s) =>
+        [s.name, ...s.aliases].map(normalize).some((a) =>
+          /^[a-z0-9]{1,2}$/.test(a) ? n === a : n.includes(a)
+        )
+      );
+    };
 
     // プライベートモード等で localStorage が使えない場合でも画面は動くようにする
     const load = () => {
@@ -265,8 +315,79 @@
         }
         if (item.purpose) li.append(metaLine('目的', item.purpose));
         if (item.note) li.append(metaLine('メモ', item.note));
+        if (info) {
+          const matched = matchSupplements(item.name);
+          matched.forEach((s) => li.append(infoDetails(s)));
+          if (!matched.length) li.append(el('p', 'unknown', 'このサプリの効果データはまだありません'));
+        }
 
         list.append(li);
+      }
+      renderPairs();
+    };
+
+    const infoDetails = (s) => {
+      const d = el('details', 'info');
+      d.append(el('summary', null, `${s.name}の効果と注意点`));
+      const effects = el('ul');
+      s.effects.forEach((t) => effects.append(el('li', null, t)));
+      d.append(effects);
+      if (s.timing) d.append(metaLine('飲み方', s.timing));
+      if (s.upperLimit) d.append(metaLine('上限量', s.upperLimit));
+      if (s.medicationNotes?.length) {
+        d.append(metaLine('薬との飲み合わせ', ''));
+        const meds = el('ul');
+        s.medicationNotes.forEach((t) => meds.append(el('li', null, t)));
+        d.append(meds);
+      }
+      return d;
+    };
+
+    // 登録済みサプリの組み合わせに当てはまる注意ペア・相性の良いペアを表示する
+    const renderPairs = () => {
+      pairsList.replaceChildren();
+      if (!info) return;
+      const ids = new Set(items.flatMap((i) => matchSupplements(i.name).map((s) => s.id)));
+      const nameOf = (id) => info.supplements.find((s) => s.id === id)?.name ?? id;
+      const hits = info.interactions
+        .filter((x) => x.pair.every((id) => ids.has(id)))
+        .sort((a, b) => (a.type === b.type ? 0 : a.type === 'caution' ? -1 : 1));
+      pairsCard.classList.toggle('hidden', hits.length === 0);
+      for (const x of hits) {
+        const li = el('li', `pair ${x.type}`);
+        const label = x.type === 'caution' ? '注意' : '相性◎';
+        li.append(el('span', 'pair-title', `${label}: ${x.pair.map(nameOf).join(' × ')}`));
+        li.append(el('p', null, x.summary));
+        if (x.advice) li.append(el('p', null, `→ ${x.advice}`));
+        pairsList.append(li);
+      }
+    };
+
+    const renderDisclaimer = () => {
+      disclaimer.replaceChildren(el('p', null, info.meta.disclaimer), el('p', null, info.meta.upperLimitNote));
+      const p = el('p', null, '出典: ');
+      Object.values(info.meta.sources).forEach((src, i) => {
+        if (i) p.append('、');
+        const a = el('a', null, src.title.replace(' - Health Professional Fact Sheet (NIH ODS)', ''));
+        a.href = src.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        p.append(a);
+      });
+      p.append(' (いずれも NIH Office of Dietary Supplements)');
+      disclaimer.append(p);
+    };
+
+    const loadInfo = async () => {
+      try {
+        const res = await fetch('data/supplements.json');
+        if (!res.ok) throw new Error(res.status);
+        info = await res.json();
+        renderDisclaimer();
+        render();
+      } catch {
+        disclaimer.replaceChildren(el('p', null,
+          '効果・飲み合わせのデータを読み込めませんでした。ファイルを直接開いている場合は、GitHub Pages などWebサーバー経由で開いてください。'));
       }
     };
 
@@ -330,6 +451,7 @@
     cancelBtn.addEventListener('click', resetForm);
 
     render();
+    loadInfo();
   </script>
 </body>
 </html>
