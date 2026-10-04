@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>サプリ管理</title>
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --card: #ffffff;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --accent: #0a84ff;
+      --danger: #ff3b30;
+      --border: #d2d2d7;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #111113;
+        --card: #1c1c1e;
+        --text: #f5f5f7;
+        --muted: #a1a1a6;
+        --border: #3a3a3c;
+        color-scheme: dark;
+      }
+    }
+    :root[data-theme="dark"] {
+        --bg: #111113;
+        --card: #1c1c1e;
+        --text: #f5f5f7;
+        --muted: #a1a1a6;
+        --border: #3a3a3c;
+        color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+    }
+    main { max-width: 560px; margin: 0 auto; }
+    h1 { font-size: 1.4rem; margin: 8px 0 16px; }
+    h2 { font-size: 1rem; margin: 0 0 12px; color: var(--muted); font-weight: 600; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    form { display: grid; gap: 12px; }
+    label { display: grid; gap: 4px; font-size: 0.9rem; color: var(--muted); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      font: inherit;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text);
+    }
+    textarea { resize: vertical; min-height: 60px; }
+    .timings { display: flex; flex-wrap: wrap; gap: 6px; }
+    .timings label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .timings input { width: auto; margin: 0; }
+    .actions { display: flex; gap: 8px; }
+    .actions button { flex: 1; }
+    button {
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .primary { background: var(--accent); color: #fff; }
+    .secondary { background: var(--border); color: var(--text); }
+    .danger { background: transparent; color: var(--danger); border: 1px solid var(--border); }
+    .small { padding: 6px 10px; font-size: 0.85rem; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .list-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .count { color: var(--muted); font-size: 0.9rem; }
+    ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+    li {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: grid;
+      gap: 6px;
+    }
+    .item-head { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+    .name { font-weight: 600; font-size: 1.05rem; overflow-wrap: anywhere; }
+    .dose { color: var(--muted); font-size: 0.9rem; }
+    .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .tag {
+      font-size: 0.8rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 15%, transparent);
+      color: var(--accent);
+    }
+    .meta { font-size: 0.9rem; overflow-wrap: anywhere; white-space: pre-wrap; }
+    .meta b { color: var(--muted); font-weight: 600; }
+    .item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .empty { color: var(--muted); text-align: center; padding: 16px 0; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>サプリ管理</h1>
+
+    <section class="card">
+      <h2 id="formTitle">サプリを登録</h2>
+      <form id="form">
+        <label>名前 *
+          <input id="name" required maxlength="100" placeholder="例: ビタミンD">
+        </label>
+        <div class="row">
+          <label>1回の量
+            <input id="dose" maxlength="50" placeholder="例: 1粒 / 1000IU">
+          </label>
+          <label>頻度
+            <select id="frequency">
+              <option value="毎日">毎日</option>
+              <option value="週に数回">週に数回</option>
+              <option value="必要なときだけ">必要なときだけ</option>
+            </select>
+          </label>
+        </div>
+        <div>
+          <span style="font-size:0.9rem;color:var(--muted)">飲むタイミング</span>
+          <div class="timings" id="timings" style="margin-top:4px">
+            <label><input type="checkbox" value="朝"> 朝</label>
+            <label><input type="checkbox" value="昼"> 昼</label>
+            <label><input type="checkbox" value="夜"> 夜</label>
+            <label><input type="checkbox" value="寝る前"> 寝る前</label>
+            <label><input type="checkbox" value="食後"> 食後</label>
+            <label><input type="checkbox" value="空腹時"> 空腹時</label>
+          </div>
+        </div>
+        <label>目的・期待する効果
+          <input id="purpose" maxlength="200" placeholder="例: 骨の健康、免疫">
+        </label>
+        <label>メモ
+          <textarea id="note" maxlength="1000" placeholder="例: 脂溶性なので食後に"></textarea>
+        </label>
+        <div class="actions">
+          <button type="submit" class="primary" id="submitBtn">登録</button>
+          <button type="button" class="secondary hidden" id="cancelBtn">キャンセル</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="list-head">
+        <h2>飲んでいるサプリ</h2>
+        <span class="count" id="count"></span>
+      </div>
+      <ul id="list"></ul>
+      <p class="empty hidden" id="empty">まだ登録されていません。</p>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'supplements.v1';
+
+    const form = document.getElementById('form');
+    const formTitle = document.getElementById('formTitle');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const fields = {
+      name: document.getElementById('name'),
+      dose: document.getElementById('dose'),
+      frequency: document.getElementById('frequency'),
+      purpose: document.getElementById('purpose'),
+      note: document.getElementById('note'),
+    };
+    const timingBoxes = document.querySelectorAll('#timings input');
+    const list = document.getElementById('list');
+    const empty = document.getElementById('empty');
+    const count = document.getElementById('count');
+
+    let editingId = null;
+
+    // プライベートモード等で localStorage が使えない場合でも画面は動くようにする
+    const load = () => {
+      try {
+        const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return Array.isArray(data) ? data : [];
+      } catch {
+        return [];
+      }
+    };
+
+    const save = () => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      } catch {
+        alert('保存できませんでした。ブラウザの設定を確認してください。');
+      }
+    };
+
+    let items = load();
+
+    const el = (tag, className, text) => {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text != null) node.textContent = text;
+      return node;
+    };
+
+    const metaLine = (label, value) => {
+      const p = el('p', 'meta');
+      p.style.margin = '0';
+      p.append(el('b', null, `${label}: `), value);
+      return p;
+    };
+
+    const render = () => {
+      list.replaceChildren();
+      empty.classList.toggle('hidden', items.length > 0);
+      count.textContent = items.length ? `${items.length}件` : '';
+
+      for (const item of items) {
+        const li = el('li');
+
+        const head = el('div', 'item-head');
+        const title = el('div');
+        title.append(el('div', 'name', item.name));
+        const doseText = [item.dose, item.frequency].filter(Boolean).join('・');
+        if (doseText) title.append(el('div', 'dose', doseText));
+
+        const actions = el('div', 'item-actions');
+        const editBtn = el('button', 'secondary small', '編集');
+        editBtn.type = 'button';
+        editBtn.addEventListener('click', () => startEdit(item.id));
+        const delBtn = el('button', 'danger small', '削除');
+        delBtn.type = 'button';
+        delBtn.addEventListener('click', () => remove(item.id));
+        actions.append(editBtn, delBtn);
+        head.append(title, actions);
+        li.append(head);
+
+        if (item.timings?.length) {
+          const tags = el('div', 'tags');
+          item.timings.forEach((t) => tags.append(el('span', 'tag', t)));
+          li.append(tags);
+        }
+        if (item.purpose) li.append(metaLine('目的', item.purpose));
+        if (item.note) li.append(metaLine('メモ', item.note));
+
+        list.append(li);
+      }
+    };
+
+    const resetForm = () => {
+      form.reset();
+      editingId = null;
+      formTitle.textContent = 'サプリを登録';
+      submitBtn.textContent = '登録';
+      cancelBtn.classList.add('hidden');
+    };
+
+    const startEdit = (id) => {
+      const item = items.find((i) => i.id === id);
+      if (!item) return;
+      editingId = id;
+      fields.name.value = item.name;
+      fields.dose.value = item.dose || '';
+      fields.frequency.value = item.frequency || '毎日';
+      fields.purpose.value = item.purpose || '';
+      fields.note.value = item.note || '';
+      timingBoxes.forEach((b) => (b.checked = item.timings?.includes(b.value) ?? false));
+      formTitle.textContent = 'サプリを編集';
+      submitBtn.textContent = '更新';
+      cancelBtn.classList.remove('hidden');
+      form.scrollIntoView({ behavior: 'smooth' });
+      fields.name.focus();
+    };
+
+    const remove = (id) => {
+      const item = items.find((i) => i.id === id);
+      if (!item || !confirm(`「${item.name}」を削除しますか？`)) return;
+      items = items.filter((i) => i.id !== id);
+      if (editingId === id) resetForm();
+      save();
+      render();
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = fields.name.value.trim();
+      if (!name) return;
+      const data = {
+        name,
+        dose: fields.dose.value.trim(),
+        frequency: fields.frequency.value,
+        timings: [...timingBoxes].filter((b) => b.checked).map((b) => b.value),
+        purpose: fields.purpose.value.trim(),
+        note: fields.note.value.trim(),
+      };
+      if (editingId) {
+        items = items.map((i) => (i.id === editingId ? { ...i, ...data, updatedAt: Date.now() } : i));
+      } else {
+        const id = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        items.push({ id, ...data, createdAt: Date.now() });
+      }
+      save();
+      resetForm();
+      render();
+    });
+
+    cancelBtn.addEventListener('click', resetForm);
+
+    render();
+  </script>
+</body>
+</html>
