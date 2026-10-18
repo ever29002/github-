@@ -1,4 +1,4 @@
-"""Make one narration wav per panel.
+"""Make one narration wav per scene of name.yaml.
 
 Engines:
   voicevox (default): local VOICEVOX engine at http://127.0.0.1:50021 (free, runs on your PC)
@@ -51,9 +51,8 @@ def main() -> None:
 
     path = job_dir(args.job)
     name = load_name(path)
-    texts = [narration_of(p) for p in name["panels"]]
-    if name.get("cta"):
-        texts.append(name["cta"])
+    texts = [narration_of(s, name["product"]) for s in name["scenes"]]
+    (path / "audio").mkdir(exist_ok=True)
 
     for i, text in enumerate(texts, 1):
         out = path / "audio" / f"{i}.wav"

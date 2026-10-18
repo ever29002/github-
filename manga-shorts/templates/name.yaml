@@ -1,27 +1,44 @@
-# ネーム（4コマ）。manga-writer agent が埋める。
-# scene   : 作画指示（Geminiに渡す。英語推奨）。文字は絵に入れない。
-#           1コマ1枚の縦長（9:16）で縦画面いっぱいに出るので、寄りの構図で顔と商品を大きく。
-# caption : 動画に焼き込む字幕（日本語、1コマ40字以内目安）
-# narration: 読み上げ文（省略時は caption を読む）
-# 効果・機能の記述は spec.json の official_specs の範囲に限る。
+# 台本（絵コンテ）。manga-writer agent が埋める。全体で20〜30秒。
+# 主役は公式の商品写真（images/product1.jpg など。spec.json の asset_sources に出典を書く）。
+# 数字・機能は spec.json の official_specs に書かれたものだけ。point の spec には official_specs の item をそのまま書く。
+# narration は読み上げ（ずんだもん等）。話し言葉で短く、親しみやすく。
 
 product:
-  name: "{{product}}"
+  name: ""            # 呼び名（テロップ用、10字以内。例: ホットクック）
+  full_name: "{{product}}"
+  maker: ""           # 例: シャープ
+  model: ""           # 型番。無ければ空
   url: "{{url}}"
   pr: {{pr}}
 
-title: ""          # 動画上部の見出し（15字以内目安）
-style: "clean Japanese manga style, black and white with soft screentone, simple backgrounds"
-character: "assets/characters/guide.png"   # 案内役の3面図（作画時に毎回添付）
+theme: orange         # orange / green / blue / pink
 
-panels:
-  - scene: ""       # 起: 困りごと
-    caption: ""
-  - scene: ""       # 承: 商品の登場
-    caption: ""
-  - scene: ""       # 転: 使い方
-    caption: ""
-  - scene: ""       # 結: 効果・まとめ
-    caption: ""
-
-cta: "詳しくは\nプロフィールのリンクから"
+scenes:
+  - type: hook        # つかみ（2〜3秒）: 見る人の困りごと・あるある
+    text: ""          # 大きなテロップ（20字以内。1行9字まで。改行したい位置に \n を入れる）
+    narration: ""
+    image: ""         # 任意。漫画を使うなら images/manga1.png（draw に作画指示）。空なら商品写真
+    draw: ""          # 任意。image を Gemini アプリで描くときの英語の作画指示
+  - type: product     # 商品紹介: 公式写真と名前を大きく
+    narration: ""     # 例: そこで、シャープのホットクックなのだ！
+    image: images/product1.jpg
+  - type: point       # ポイント（2〜3個）
+    big: ""           # 大きく出す数字・言葉（10字以内。例: 予約 最大15時間）
+    text: ""          # 補足（20字以内）
+    spec: ""          # 根拠の official_specs の item（そのままコピー）
+    narration: ""
+    image: images/product1.jpg
+  - type: point
+    big: ""
+    text: ""
+    spec: ""
+    narration: ""
+    image: images/product1.jpg
+  - type: steps       # 使い方3ステップ
+    title: "使い方はカンタン"
+    steps: ["", "", ""]   # 各15字以内
+    narration: ""
+  - type: outro       # まとめ
+    text: "詳しくはプロフィールのリンクから"
+    narration: ""
+    image: images/product1.jpg

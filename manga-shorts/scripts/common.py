@@ -54,21 +54,50 @@ def set_state(path: Path, state: str, note: str = "") -> None:
         json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+SCENE_TYPES = {"hook", "product", "point", "steps", "outro"}
+REQUIRED = {"hook": ["text"], "product": [], "point": ["big", "spec"], "steps": ["steps"],
+            "outro": []}
+
+
 def load_name(path: Path) -> dict:
+    """Load name.yaml and check it against the scene types and spec.json's official_specs."""
     name_file = path / "name.yaml"
     if not name_file.exists():
         sys.exit(f"missing {name_file}")
     name = yaml.safe_load(name_file.read_text(encoding="utf-8"))
-    panels = name.get("panels") or []
-    if len(panels) != 4:
-        sys.exit(f"name.yaml must have exactly 4 panels (found {len(panels)})")
-    for i, panel in enumerate(panels, 1):
-        if not panel.get("scene"):
-            sys.exit(f"panel {i}: scene is required")
-        if not panel.get("caption"):
-            sys.exit(f"panel {i}: caption is required")
+    product = name.get("product") or {}
+    if not product.get("name"):
+        sys.exit("name.yaml: product.name is required")
+    scenes = name.get("scenes") or []
+    types = [s.get("type") for s in scenes]
+    if not scenes or types[0] != "hook" or "product" not in types or types[-1] != "outro":
+        sys.exit(f"name.yaml: scenes must start with hook, include product, end with outro ({types})")
+
+    spec_file = path / "spec.json"
+    official = set()
+    if spec_file.exists():
+        official = {s.get("item") for s in
+                    json.loads(spec_file.read_text(encoding="utf-8")).get("official_specs", [])}
+    for i, scene in enumerate(scenes, 1):
+        kind = scene.get("type")
+        if kind not in SCENE_TYPES:
+            sys.exit(f"scene {i}: unknown type {kind!r} (use {sorted(SCENE_TYPES)})")
+        for key in REQUIRED[kind]:
+            if not scene.get(key):
+                sys.exit(f"scene {i} ({kind}): {key} is required")
+        if kind == "point" and scene["spec"] not in official:
+            sys.exit(f"scene {i} (point): spec is not an official_specs item in spec.json: "
+                     f"{scene['spec']!r}")
+        if kind == "steps" and not all(scene["steps"]):
+            sys.exit(f"scene {i} (steps): empty step")
+        if not narration_of(scene, product):
+            sys.exit(f"scene {i} ({kind}): narration is required")
     return name
 
 
-def narration_of(panel: dict) -> str:
-    return panel.get("narration") or panel["caption"]
+def narration_of(scene: dict, product: dict) -> str:
+    if scene.get("narration"):
+        return scene["narration"]
+    if scene.get("type") == "product":
+        return f"{product.get('maker', '')}の{product['name']}！".lstrip("の")
+    return scene.get("text") or ""

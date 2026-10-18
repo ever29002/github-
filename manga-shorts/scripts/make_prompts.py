@@ -1,7 +1,9 @@
-"""Turn name.yaml into prompts.md: one vertical (9:16) image prompt per panel.
+"""Write prompts.md for the optional manga images (scenes with `draw` in name.yaml).
 
-Each panel becomes its own full-screen image in the video, so it is drawn vertical from the start.
-gen_art.py (API) and the browser procedure read the "### コマN" blocks.
+The product itself is always shown with its official photo, so the manga only
+illustrates a situation (e.g. the hook's everyday problem) and never draws the
+product. Paste each prompt into the Gemini app (free) and save the image to the
+path in its heading. When no scene has `draw`, there is nothing to generate.
 
 Usage: python3 scripts/make_prompts.py <job>
 """
@@ -10,12 +12,12 @@ import argparse
 
 from common import job_dir, load_name, set_state
 
-PANEL_RULES = """\
-- ONE single manga panel filling the whole image, vertical 9:16 (portrait, like a phone screen). No borders, no multiple panels.
-- Keep the main subject in the middle 60% of the height; the top 15% and bottom 25% are quiet background (captions go there).
-- Absolutely NO text, letters, numbers, sound effects or logos drawn as text anywhere. No speech bubbles.
-- Keep the guide character identical to the attached character reference sheet in every panel.
-- Draw the product to match the attached product photo exactly (shape, color, ports, buttons). Do not invent features."""
+RULES = """\
+- ONE single illustration in portrait orientation (3:4) for a smartphone screen. No panel grid.
+- Friendly, warm and simple. Medium shot or close-up so faces read clearly on a phone.
+- Do NOT draw the product or any brand, logo or appliance that could be mistaken for it.
+- Absolutely NO text, letters, numbers or speech bubbles.
+- Keep the guide character identical to the attached character reference sheet (face, hair, outfit)."""
 
 
 def main() -> None:
@@ -25,36 +27,25 @@ def main() -> None:
 
     path = job_dir(args.job)
     name = load_name(path)
+    todo = [s for s in name["scenes"] if s.get("draw")]
+    for scene in todo:
+        if not scene.get("image"):
+            raise SystemExit(f"scene with draw needs image: (e.g. images/manga1.png): {scene['draw']}")
 
-    blocks = []
-    for i, p in enumerate(name["panels"], 1):
-        prompt = f"""Style: {name.get('style', '')}
+    blocks = "\n\n".join(
+        f"## {s['image']}\n\n```\nStyle: {name.get('style') or 'soft, friendly Japanese manga style, warm colors'}"
+        f"\n\nRules:\n{RULES}\n\nDraw: {s['draw']}\n```" for s in todo)
+    character = name.get("character") or "assets/characters/guide.png"
+    out = f"""# 作画プロンプト（任意の漫画イラスト）
 
-Rules:
-{PANEL_RULES}
+商品は公式写真で見せるので、ここでは商品を描かない。Gemini アプリ（無料）に貼って生成し、見出しのパスに保存する。
+添付するもの: 案内役の3面図 `{character}`（あれば）
 
-Scene ({i} of 4 in the story): {p['scene']}"""
-        blocks.append(f"### コマ{i}\n\n```\n{prompt}\n```")
-
-    character = name.get("character") or "（未設定）"
-    out = f"""# 作画プロンプト（Geminiアプリに貼る）
-
-商品: {name['product']['name']}
-
-## 添付するもの
-1. 案内役の3面図: `{character}`
-2. 商品画像（spec.json の asset_sources に出典がある、利用許諾のあるもの）
-
-## プロンプト（同じチャットで、コマ1から順に1つずつ貼る）
-
-{chr(10).join(blocks)}
-
-## 保存
-- 生成画像を `images/panel1.png` 〜 `images/panel4.png` として保存する。
-- 横長になった、顔が別人、商品の形が違う、文字が入っている場合はそのコマだけ再生成（最大3回）。
+{blocks or "（draw のあるシーンが無いので、作画は不要）"}
 """
     (path / "prompts.md").write_text(out, encoding="utf-8")
-    set_state(path, "awaiting_art", "prompts.md generated")
+    # The official photos (and any drawn images) still go through art-checker.
+    set_state(path, "awaiting_art", f"prompts.md: {len(todo)} image(s) to draw")
     print(path / "prompts.md")
 
 

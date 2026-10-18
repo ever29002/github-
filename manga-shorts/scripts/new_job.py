@@ -23,7 +23,7 @@ def main() -> None:
     path = JOBS_DIR / f"{date.today().isoformat()}-{args.slug}"
     if path.exists():
         raise SystemExit(f"already exists: {path}")
-    for sub in ("images", "panels", "audio"):
+    for sub in ("images", "audio"):
         (path / sub).mkdir(parents=True)
 
     spec = {
