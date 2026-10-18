@@ -19,7 +19,9 @@ from common import job_dir, load_name, set_state
 
 W, H, FPS = 1080, 1920, 30
 MIN_SEC, TAIL_SEC = 3.0, 0.5
-PANEL_BOX = (40, 360, 1040, 1380)   # left, top, right, bottom
+PANEL_BOX = (40, 360, 1040, 1380)   # left, top, right, bottom (old 4-koma page panels)
+# Captions end above the bottom ~18% that Shorts/TikTok/Reels cover with their own buttons.
+CAPTION_BOTTOM = 1560
 ZOOM = 0.07
 NO_LINE_START = "、。，．！？!?」』）)ーっゃゅょァィゥェォッャュョ"
 FONT_CANDIDATES = [
@@ -58,11 +60,12 @@ def wrap(draw: ImageDraw.ImageDraw, text: str, font, max_width: int) -> list[str
     return lines
 
 
-def text_block(draw, text, font, center_y, max_width, fill, box_fill=None, pad=28):
+def text_block(draw, text, font, center_y, max_width, fill, box_fill=None, pad=28, bottom=None):
+    """Draw centered lines around center_y, or ending at bottom when it is given."""
     lines = wrap(draw, text, font, max_width)
     line_h = font.size * 1.35
     height = line_h * len(lines)
-    top = center_y - height / 2
+    top = bottom - height if bottom is not None else center_y - height / 2
     if box_fill:
         width = max(draw.textlength(line, font=font) for line in lines)
         draw.rounded_rectangle(
@@ -93,8 +96,11 @@ def overlay(name: dict, pr: bool, fonts: dict) -> Image.Image:
 
 
 def fit_box(panel: Image.Image) -> tuple[int, int, int, int]:
-    left, top, right, bottom = PANEL_BOX
-    scale = min((right - left) / panel.width, (bottom - top) / panel.height)
+    # a vertical panel (one image per panel, 9:16) covers the frame; title and caption sit on top
+    tall = panel.height >= panel.width * 1.5
+    left, top, right, bottom = (0, 0, W, H) if tall else PANEL_BOX
+    pick = max if tall else min
+    scale = pick((right - left) / panel.width, (bottom - top) / panel.height)
     w, h = round(panel.width * scale), round(panel.height * scale)
     x = left + (right - left - w) // 2
     y = top + (bottom - top - h) // 2
@@ -105,8 +111,8 @@ def panel_frames(panel, caption, seconds, base_overlay, fonts):
     bg = background(panel)
     x, y, w, h = fit_box(panel)
     caption_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    text_block(ImageDraw.Draw(caption_layer), caption, fonts["caption"], 1620, 940,
-               (20, 20, 20), (255, 255, 255, 235))
+    text_block(ImageDraw.Draw(caption_layer), caption, fonts["caption"], None, 940,
+               (20, 20, 20), (255, 255, 255, 235), bottom=CAPTION_BOTTOM)
     static = Image.alpha_composite(base_overlay, caption_layer)
     frames = round(seconds * FPS)
     for f in range(frames):

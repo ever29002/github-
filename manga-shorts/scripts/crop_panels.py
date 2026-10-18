@@ -1,5 +1,8 @@
 """Split images/page1.png into 4 panel images by detecting the white gutters.
 
+If the art was made one image per panel (images/panel1.png .. panel4.png, the vertical
+format), those are copied to panels/ as they are.
+
 Handles a vertical 4-koma strip (top to bottom) and a 2x2 grid (right to left,
 then top to bottom, as manga is read). Falls back to an equal vertical split.
 
@@ -65,6 +68,17 @@ def main() -> None:
     args = parser.parse_args()
 
     path = job_dir(args.job)
+    singles = [path / "images" / f"panel{i}.png" for i in range(1, 5)]
+    if all(p.exists() for p in singles):
+        for i, src in enumerate(singles, 1):
+            img = Image.open(src).convert("RGB")
+            # drop the plain white margin some generations leave around the panel border
+            ink = img.convert("L").point(lambda v: 255 if v < WHITE else 0).getbbox()
+            (img.crop(ink) if ink else img).save(path / "panels" / f"{i}.png")
+        (path / "panels" / "boxes.json").write_text(
+            json.dumps({"method": "single-panels"}) + "\n", encoding="utf-8")
+        print("single-panels: copied images/panel1-4.png")
+        return
     page = Image.open(path / args.image).convert("RGB")
     boxes, method = detect(page)
     for i, box in enumerate(boxes, 1):

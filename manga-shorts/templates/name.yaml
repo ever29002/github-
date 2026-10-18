@@ -1,5 +1,6 @@
 # ネーム（4コマ）。manga-writer agent が埋める。
 # scene   : 作画指示（Geminiに渡す。英語推奨）。文字は絵に入れない。
+#           1コマ1枚の縦長（9:16）で縦画面いっぱいに出るので、寄りの構図で顔と商品を大きく。
 # caption : 動画に焼き込む字幕（日本語、1コマ40字以内目安）
 # narration: 読み上げ文（省略時は caption を読む）
 # 効果・機能の記述は spec.json の official_specs の範囲に限る。
