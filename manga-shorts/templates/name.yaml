@@ -1,0 +1,44 @@
+# 台本（絵コンテ）。manga-writer agent が埋める。全体で20〜30秒。
+# 主役は公式の商品写真（images/product1.jpg など。spec.json の asset_sources に出典を書く）。
+# 数字・機能は spec.json の official_specs に書かれたものだけ。point の spec には official_specs の item をそのまま書く。
+# narration は読み上げ（ずんだもん等）。話し言葉で短く、親しみやすく。
+
+product:
+  name: ""            # 呼び名（テロップ用、10字以内。例: ホットクック）
+  full_name: "{{product}}"
+  maker: ""           # 例: シャープ
+  model: ""           # 型番。無ければ空
+  url: "{{url}}"
+  pr: {{pr}}
+
+theme: orange         # orange / green / blue / pink
+
+scenes:
+  - type: hook        # つかみ（2〜3秒）: 見る人の困りごと・あるある
+    text: ""          # 大きなテロップ（20字以内。1行9字まで。改行したい位置に \n を入れる）
+    narration: ""
+    image: ""         # 任意。漫画を使うなら images/manga1.png（draw に作画指示）。空なら商品写真
+    draw: ""          # 任意。image を Gemini アプリで描くときの英語の作画指示
+  - type: product     # 商品紹介: 公式写真と名前を大きく
+    narration: ""     # 例: そこで、シャープのホットクックなのだ！
+    image: images/product1.jpg
+  - type: point       # ポイント（2〜3個）
+    big: ""           # 大きく出す数字・言葉（10字以内。例: 予約 最大15時間）
+    text: ""          # 補足（20字以内）
+    spec: ""          # 根拠の official_specs の item（そのままコピー）
+    narration: ""
+    image: images/product1.jpg
+  - type: point
+    big: ""
+    text: ""
+    spec: ""
+    narration: ""
+    image: images/product1.jpg
+  - type: steps       # 使い方3ステップ
+    title: "使い方はカンタン"
+    steps: ["", "", ""]   # 各15字以内
+    narration: ""
+  - type: outro       # まとめ
+    text: "詳しくはプロフィールのリンクから"
+    narration: ""
+    image: images/product1.jpg
