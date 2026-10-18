@@ -1,0 +1,26 @@
+# ネーム（4コマ）。manga-writer agent が埋める。
+# scene   : 作画指示（Geminiに渡す。英語推奨）。文字は絵に入れない。
+# caption : 動画に焼き込む字幕（日本語、1コマ40字以内目安）
+# narration: 読み上げ文（省略時は caption を読む）
+# 効果・機能の記述は spec.json の official_specs の範囲に限る。
+
+product:
+  name: "{{product}}"
+  url: "{{url}}"
+  pr: {{pr}}
+
+title: ""          # 動画上部の見出し（15字以内目安）
+style: "clean Japanese manga style, black and white with soft screentone, simple backgrounds"
+character: "assets/characters/guide.png"   # 案内役の3面図（作画時に毎回添付）
+
+panels:
+  - scene: ""       # 起: 困りごと
+    caption: ""
+  - scene: ""       # 承: 商品の登場
+    caption: ""
+  - scene: ""       # 転: 使い方
+    caption: ""
+  - scene: ""       # 結: 効果・まとめ
+    caption: ""
+
+cta: "詳しくは\nプロフィールのリンクから"
