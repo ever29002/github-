@@ -65,7 +65,11 @@ def query(notebook: str, question: str) -> dict:
         envelope = {"answer": out}
     if not isinstance(envelope, dict):
         envelope = {"answer": out}
-    answer = FOLLOW_UP.sub("", str(envelope.get("answer", "")).strip())
+    answer = str(envelope.get("answer", "")).strip()
+    head, sep, tail = answer.rpartition("\n---")
+    if sep and len(tail) < 300:  # NotebookLM appends a follow-up offer after a rule
+        answer = head.rstrip()
+    answer = FOLLOW_UP.sub("", answer)
     excerpts = []
     for ref in envelope.get("references") or []:
         if isinstance(ref, dict) and ref.get("cited_text"):
