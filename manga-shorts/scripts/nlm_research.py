@@ -52,15 +52,44 @@ def nlm(*args: str, timeout: int = 300) -> str:
     return result.stdout.strip()
 
 
-def parse_json_list(text: str):
-    match = re.search(r"\[.*\]", text, re.S)
-    if not match:
-        return None
+CITATION = re.compile(r"\s*\[\d+(?:\s*[,\-–]\s*\d+)*\]")
+FOLLOW_UP = re.compile(r"\n[^\n]*(確認してみますか|知りたいですか|いかがですか)[？?]\s*$")
+
+
+def query(notebook: str, question: str) -> dict:
+    """Ask NotebookLM. `nlm notebook query` prints a JSON envelope with the answer and references."""
+    out = nlm("notebook", "query", notebook, question)
     try:
-        data = json.loads(match.group(0))
+        envelope = json.loads(out)
     except json.JSONDecodeError:
-        return None
-    return data if isinstance(data, list) else None
+        envelope = {"answer": out}
+    if not isinstance(envelope, dict):
+        envelope = {"answer": out}
+    answer = FOLLOW_UP.sub("", str(envelope.get("answer", "")).strip())
+    excerpts = []
+    for ref in envelope.get("references") or []:
+        if isinstance(ref, dict) and ref.get("cited_text"):
+            excerpts.append(" ".join(str(ref["cited_text"]).split()))
+    return {"answer": answer, "excerpts": excerpts}
+
+
+def parse_json_list(text: str):
+    """Return the last complete JSON array in text.
+
+    The answer can hold streamed fragments of the same array repeated, so a greedy
+    match fails; try decoding from every '[' and keep the last array that parses."""
+    decoder = json.JSONDecoder()
+    found = None
+    for i, ch in enumerate(text):
+        if ch != "[":
+            continue
+        try:
+            data, _ = decoder.raw_decode(text, i)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(data, list) and data and all(isinstance(d, dict) for d in data):
+            found = data
+    return found
 
 
 def main() -> None:
@@ -98,16 +127,17 @@ def main() -> None:
     if not added:
         raise SystemExit("no sources: set url in spec.json or pass --source")
 
-    answers = {key: nlm("notebook", "query", notebook, question)
-               for key, question in QUESTIONS.items()}
+    answers = {key: query(notebook, question) for key, question in QUESTIONS.items()}
 
-    specs = parse_json_list(answers["specs"])
+    specs = parse_json_list(answers["specs"]["answer"])
     if specs:
         known = {s.get("item") for s in spec.get("official_specs", [])}
         for s in specs:
-            if s.get("item") and s["item"] not in known:
+            item = CITATION.sub("", str(s.get("item", ""))).strip()
+            if item and item not in known:
+                known.add(item)
                 spec.setdefault("official_specs", []).append(
-                    {"item": s["item"], "source": f"NotebookLM: {s.get('source', '')}",
+                    {"item": item, "source": f"NotebookLM: {s.get('source', '')}",
                      "note": "NotebookLMの回答。公開前に出典を目で確認"})
 
     spec_file.write_text(json.dumps(spec, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -118,7 +148,13 @@ def main() -> None:
     titles = {"specs": "公式仕様", "usage": "使い方", "limits": "注意点・できないこと",
               "hooks": "手間が減る場面（ネタ候補）"}
     for key, title in titles.items():
-        sections += [f"## {title}", "", answers[key], ""]
+        answer = answers[key]["answer"]
+        if key == "specs" and specs:
+            answer = "\n".join(f"- {CITATION.sub('', str(s.get('item', ''))).strip()}" for s in specs)
+        sections += [f"## {title}", "", answer, ""]
+        if answers[key]["excerpts"]:
+            sections += ["<details><summary>根拠の抜粋</summary>", "",
+                         *[f"> {e}" for e in answers[key]["excerpts"]], "", "</details>", ""]
     (path / "research.md").write_text("\n".join(sections), encoding="utf-8")
 
     if args.studio:
