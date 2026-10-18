@@ -1,13 +1,14 @@
 # manga-shorts
 
 商品の使い方・効果を4コマ漫画で説明し、1コマずつ動かして縦ショート動画（1080x1920）にするパイプライン。
-作画は人が Gemini アプリで行い、それ以外（ネーム、作画プロンプト、コマ切り出し、音声、合成）は Claude Code の agent とスクリプトが担当する。動画生成AIは使わないので、追加費用はほぼかからない。
+作画は Gemini API（`gen_art.py`、1枚あたり数円〜十数円）か、人が Gemini アプリで行う。それ以外（ネーム、作画プロンプト、コマ切り出し、音声、合成）は Claude Code の agent とスクリプトが担当する。動画生成AIは使わない。
 
 ## 必要なもの
 - Python 3.10+、`pip install pillow pyyaml`
 - ffmpeg（libx264 入り。字幕は Pillow で描くので libass は不要）
 - 日本語フォント（Linux の IPA/Noto、macOS のヒラギノ、Windows の游ゴシック/メイリオを自動で探す。`--font` で指定も可）
 - NotebookLM 連携（任意）: [notebooklm-mcp-cli](https://github.com/jacob-bd/notebooklm-mcp-cli) の `nlm` コマンド。`nlm login` で Chrome からログインしておく。非公式の内部APIを使うため、予告なく動かなくなることがある
+- 作画の自動化（任意）: `pip install google-genai` と、Google AI Studio で発行した `GEMINI_API_KEY`（課金を有効にしたプロジェクト）。Google AI Pro の契約とは別料金。モデルは `--model` か `GEMINI_IMAGE_MODEL` で変えられる（既定 `gemini-2.5-flash-image`）
 - 音声: [VOICEVOX](https://voicevox.hiroshiba.jp/)（無料。起動しておくと `http://127.0.0.1:50021` で使える）。無い場合は `--engine silent` で字幕だけの動画になる
 
 ## 流れ
@@ -18,7 +19,9 @@ python3 scripts/nlm_research.py jobs/<日付>-cable-box --source https://<取扱
 #  → NotebookLM に公式ページを入れて質問し、research.md と spec.json の仕様を埋める（PCで nlm が使える場合）
 #  [manga-writer] research.md と spec.json をもとに name.yaml を書く
 python3 scripts/make_prompts.py jobs/<日付>-cable-box
-#  [人] prompts.md を Gemini アプリに貼り、3面図と商品画像を添付して生成 → images/page1.png に保存
+python3 scripts/gen_art.py character                   # 初回だけ: 3面図 → assets/characters/guide.png
+python3 scripts/gen_art.py jobs/<日付>-cable-box       # 商品写真を images/product1.jpg に置いてから → images/page1.png
+#  （APIキーが無ければ [人] prompts.md を Gemini アプリに貼って生成し、images/page1.png に保存）
 #  [art-checker] crop_panels.py で切り出し、画像を見て qc.json を書く
 python3 scripts/crop_panels.py jobs/<日付>-cable-box
 python3 scripts/tts.py jobs/<日付>-cable-box            # VOICEVOX（--engine silent で無音）
@@ -37,7 +40,7 @@ Claude Code では `manga-short` スキル（`.claude/skills/manga-short/`）が
 | `research.md` | NotebookLM の調査結果（仕様・使い方・注意点・ネタ候補） |
 | `name.yaml` | 4コマのネーム（作画指示・字幕・読み上げ文） |
 | `prompts.md` | Gemini に貼る作画プロンプト |
-| `images/page1.png` | 人が生成した4コマ |
+| `images/page1.png` | 生成した4コマ（再生成前の画像は `rejected-<n>.png`） |
 | `qc.json` | 検品結果 |
 | `panels/` | 切り出したコマ |
 | `audio/` | コマごとの音声と結合した narration.wav |
