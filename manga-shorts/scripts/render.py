@@ -28,6 +28,8 @@ MIN_SEC = {"hook": 2.5, "product": 2.5, "point": 3.0, "steps": 4.5, "outro": 3.0
 POP_SEC = 0.32
 # Shorts/TikTok/Reels cover roughly the bottom 18% with their UI: keep content above it.
 CONTENT_BOTTOM = 1540
+# Shorts/TikTok play loud: normalize to about -14 LUFS without clipping.
+LOUDNORM = "loudnorm=I=-14:TP=-1.5:LRA=11"
 
 THEMES = {
     "orange": {"bg": (255, 244, 226), "dot": (255, 230, 196), "accent": (255, 122, 47),
@@ -243,7 +245,7 @@ def scene_sprites(scene: dict, name: dict, path: Path, theme: dict, fonts: dict,
     elif kind == "steps":
         sprites.append(Sprite(text_sprite(scene.get("title") or "使い方", fonts["title"], ink, 960,
                                           10, "white", theme["sub"]), (W / 2, 380)))
-        gap = (dur - 0.6) / len(scene["steps"])
+        gap = min(1.1, (dur - 0.6) / len(scene["steps"]))   # keep pace with the narration
         for i, step in enumerate(scene["steps"]):
             row = Image.new("RGBA", (960, 240), (0, 0, 0, 0))
             draw = ImageDraw.Draw(row)
@@ -375,8 +377,10 @@ def main() -> None:
     if args.bgm:
         cmd += ["-stream_loop", "-1", "-i", args.bgm, "-filter_complex",
                 f"[2:a]volume={args.bgm_volume},afade=t=out:st={max(0, total - 1.5)}:d=1.5[bgm];"
-                "[1:a][bgm]amix=inputs=2:duration=first:normalize=0[a]",
+                f"[1:a][bgm]amix=inputs=2:duration=first:normalize=0,{LOUDNORM}[a]",
                 "-map", "0:v", "-map", "[a]"]
+    else:
+        cmd += ["-af", LOUDNORM]
     cmd += ["-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20",
             "-c:a", "aac", "-b:a", "160k", "-shortest", str(path / "video.mp4")]
 

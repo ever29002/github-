@@ -20,11 +20,13 @@ CHARS_PER_SEC = 7.0
 SAMPLE_RATE = 24000
 
 
-def voicevox(text: str, speaker: int) -> bytes:
+def voicevox(text: str, speaker: int, speed: float) -> bytes:
     query_url = f"{VOICEVOX}/audio_query?" + urllib.parse.urlencode(
         {"text": text, "speaker": speaker})
     with urllib.request.urlopen(urllib.request.Request(query_url, method="POST")) as res:
-        query = res.read()
+        query = json.loads(res.read())
+    query["speedScale"] = speed
+    query = json.dumps(query).encode("utf-8")
     synth = urllib.request.Request(
         f"{VOICEVOX}/synthesis?speaker={speaker}", data=query, method="POST",
         headers={"Content-Type": "application/json"})
@@ -47,6 +49,8 @@ def main() -> None:
     parser.add_argument("--engine", choices=["voicevox", "silent"], default="voicevox")
     parser.add_argument("--speaker", type=int, default=3,
                         help="VOICEVOX style id (3 = ずんだもん ノーマル)")
+    parser.add_argument("--speed", type=float, default=1.15,
+                        help="VOICEVOX speaking speed (1.15 keeps a short around 28s)")
     args = parser.parse_args()
 
     path = job_dir(args.job)
@@ -57,7 +61,7 @@ def main() -> None:
     for i, text in enumerate(texts, 1):
         out = path / "audio" / f"{i}.wav"
         if args.engine == "voicevox":
-            out.write_bytes(voicevox(text, args.speaker))
+            out.write_bytes(voicevox(text, args.speaker, args.speed))
         else:
             write_silence(out, text)
         print(out)
