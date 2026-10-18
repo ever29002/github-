@@ -7,13 +7,16 @@
 - Python 3.10+、`pip install pillow pyyaml`
 - ffmpeg（libx264 入り。字幕は Pillow で描くので libass は不要）
 - 日本語フォント（Linux の IPA/Noto、macOS のヒラギノ、Windows の游ゴシック/メイリオを自動で探す。`--font` で指定も可）
+- NotebookLM 連携（任意）: [notebooklm-mcp-cli](https://github.com/jacob-bd/notebooklm-mcp-cli) の `nlm` コマンド。`nlm login` で Chrome からログインしておく。非公式の内部APIを使うため、予告なく動かなくなることがある
 - 音声: [VOICEVOX](https://voicevox.hiroshiba.jp/)（無料。起動しておくと `http://127.0.0.1:50021` で使える）。無い場合は `--engine silent` で字幕だけの動画になる
 
 ## 流れ
 ```
 python3 scripts/new_job.py cable-box --product "ケーブル収納ボックス" --url https://... --pr
 #  → jobs/<日付>-cable-box/ ができる（spec.json, name.yaml, captions.md）
-#  [manga-writer] spec.json に公式スペックを転記し、name.yaml を書く
+python3 scripts/nlm_research.py jobs/<日付>-cable-box --source https://<取扱説明書のURL>
+#  → NotebookLM に公式ページを入れて質問し、research.md と spec.json の仕様を埋める（PCで nlm が使える場合）
+#  [manga-writer] research.md と spec.json をもとに name.yaml を書く
 python3 scripts/make_prompts.py jobs/<日付>-cable-box
 #  [人] prompts.md を Gemini アプリに貼り、3面図と商品画像を添付して生成 → images/page1.png に保存
 #  [art-checker] crop_panels.py で切り出し、画像を見て qc.json を書く
@@ -31,6 +34,7 @@ Claude Code では `manga-short` スキル（`.claude/skills/manga-short/`）が
 |---|---|
 | `status.json` | 状態と履歴（candidate → awaiting_art → qc_passed → rendered → awaiting_check → published） |
 | `spec.json` | 商品名、URL、PRかどうか、公式スペック、素材の出典 |
+| `research.md` | NotebookLM の調査結果（仕様・使い方・注意点・ネタ候補） |
 | `name.yaml` | 4コマのネーム（作画指示・字幕・読み上げ文） |
 | `prompts.md` | Gemini に貼る作画プロンプト |
 | `images/page1.png` | 人が生成した4コマ |

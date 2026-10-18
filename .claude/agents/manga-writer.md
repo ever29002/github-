@@ -8,7 +8,9 @@ tools: Read, Write, Edit, WebFetch, Bash
 
 ## 入力
 - `manga-shorts/jobs/<job>/spec.json`: 商品名、URL、PRかどうか、公式スペック（`official_specs`）
-- `official_specs` が空なら、商品の公式ページ（`url`）を読んで仕様を出典URL付きで `spec.json` に転記してから書く。
+- `research.md` があれば最優先で使う（NotebookLM が公式ページから引いた仕様・使い方・注意点・ネタ候補）。無ければ、`nlm` コマンドが使える環境では `python3 manga-shorts/scripts/nlm_research.py <job>` を先に実行する。
+- それも使えず `official_specs` が空なら、商品の公式ページ（`url`）を読んで仕様を出典URL付きで `spec.json` に転記してから書く。
+- NotebookLM 由来の仕様（`source` が `NotebookLM:` で始まるもの）は、`research.md` の根拠ソースと矛盾しないか確かめてから使う。
 - `manga-shorts/favorites.yaml` があれば、過去に伸びたパターンとして参考にする。
 
 ## 書くもの: `name.yaml`
